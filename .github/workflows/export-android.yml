@@ -1,0 +1,78 @@
+name: Export Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+env:
+  GODOT_VERSION: "4.3"
+
+jobs:
+  export-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Java 17 (requis par Gradle/Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Télécharger Godot (headless) et les templates d'export
+        run: |
+          mkdir -p /tmp/godot
+          cd /tmp/godot
+          curl -L -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip godot.zip
+          mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot_bin
+          chmod +x godot_bin
+
+          curl -L -o templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          unzip templates.tpz -d /tmp/godot/templates_extracted
+          mv /tmp/godot/templates_extracted/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+
+      - name: Configurer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Accepter les licences Android SDK
+        run: yes | sdkmanager --licenses || true
+
+      - name: Générer un keystore de debug
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+      - name: Configurer Godot pour utiliser le keystore debug
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.tres << 'EOF'
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/debug_keystore = "/root/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+
+      - name: Créer le dossier de build
+        run: mkdir -p build
+
+      - name: Exporter l'APK (debug)
+        run: |
+          /tmp/godot/godot_bin --headless --path . \
+            --export-debug "Android" build/souris-verte.apk
+
+      - name: Publier l'APK en artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: souris-verte-apk
+          path: build/souris-verte.apk
+          if-no-files-found: error
