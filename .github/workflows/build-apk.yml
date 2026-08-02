@@ -1,0 +1,47 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configurer Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurer Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Rendre gradlew exécutable (si présent)
+        run: chmod +x ./gradlew || true
+
+      - name: Compiler l'APK debug
+        run: gradle assembleDebug --no-daemon
+
+      - name: Uploader l'APK comme artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: matrix-launcher-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Créer une release avec l'APK
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Matrix Launcher build ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
