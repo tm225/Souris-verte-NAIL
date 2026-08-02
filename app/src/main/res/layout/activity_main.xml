@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/matrix_black">
+
+    <!-- Fond animé : pluie de code -->
+    <com.matrixlauncher.theme.MatrixRainView
+        android:id="@+id/matrixRain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Écran d'accueil : horloge + grille d'apps -->
+    <LinearLayout
+        android:id="@+id/homeContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/clockText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="48dp"
+            android:fontFamily="monospace"
+            android:textColor="@color/matrix_green"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            android:shadowColor="@color/matrix_green"
+            android:shadowRadius="18"
+            tools:text="14:32:07" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/appGrid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="24dp"
+            android:clipToPadding="false"
+            android:paddingBottom="24dp" />
+
+    </LinearLayout>
+
+    <!-- Overlay de verrouillage -->
+    <LinearLayout
+        android:id="@+id/lockOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/matrix_overlay"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:elevation="20dp">
+
+        <TextView
+            android:id="@+id/lockTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lock_title"
+            android:fontFamily="monospace"
+            android:textColor="@color/matrix_green"
+            android:textSize="20sp"
+            android:letterSpacing="0.15"
+            android:shadowColor="@color/matrix_green"
+            android:shadowRadius="14" />
+
+        <ImageView
+            android:id="@+id/fingerprintIcon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="36dp"
+            android:src="@drawable/ic_fingerprint"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/lockSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/unlock_hint"
+            android:fontFamily="monospace"
+            android:textColor="@color/matrix_green_dim"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/decodeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:fontFamily="monospace"
+            android:textColor="@color/matrix_green_bright"
+            android:textSize="16sp"
+            android:letterSpacing="0.1"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+</FrameLayout>

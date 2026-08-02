@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Matrix Launcher</string>
+    <string name="lock_title">SYSTÈME VERROUILLÉ</string>
+    <string name="lock_subtitle">Authentification biométrique requise</string>
+    <string name="unlock_hint">Touchez le capteur d\'empreinte</string>
+    <string name="access_granted">ACCÈS AUTORISÉ</string>
+    <string name="biometric_prompt_title">Déverrouillage</string>
+    <string name="biometric_prompt_subtitle">Scanne ton empreinte pour continuer</string>
+</resources>
